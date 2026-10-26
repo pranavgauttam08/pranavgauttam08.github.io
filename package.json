@@ -10,6 +10,10 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "serve": "node scripts/serve.mjs",
-    "dev": "node scripts/build.mjs && node scripts/serve.mjs"
+    "dev": "node scripts/build.mjs && node scripts/serve.mjs",
+    "validate": "node scripts/validate.mjs",
+    "validate:strict": "node scripts/validate.mjs --strict",
+    "test": "node --test",
+    "check": "npm run build && npm run validate:strict && npm test"
   }
 }
