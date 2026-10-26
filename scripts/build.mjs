@@ -17,6 +17,10 @@ import { buildGraph } from '../src/schema/graph.mjs';
 // diagram:begin
 import { buildReport } from '../src/schema/report.mjs';
 // diagram:end
+// crawl:begin
+import { renderRobots } from '../src/crawl/robots.mjs';
+import { renderLlmsTxt } from '../src/crawl/llms.mjs';
+// crawl:end
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -92,6 +96,10 @@ export async function build({ rootDir = ROOT, outDir, siteUrl, log = console.log
   await writeFile(path.join(out, 'schema-report.json'), `${JSON.stringify(buildReport(site, pages, graphs), null, 2)}\n`);
   // diagram:end
 
+  // crawl:begin
+  await writeFile(path.join(out, 'robots.txt'), renderRobots(site));
+  await writeFile(path.join(out, 'llms.txt'), renderLlmsTxt(site, pages, { schemaReport: graphs.size > 0 }));
+  // crawl:end
 
   log(`Built ${pages.length} pages into ${path.relative(process.cwd(), out) || '.'} for ${site.siteUrl}`);
   return { site, pages, graphs, outDir: out };

@@ -29,6 +29,9 @@ export function footerLinks(site) {
     if (url.includes('linkedin.com')) links.push({ href: url, label: 'LinkedIn' });
   }
   links.push({ href: '/sitemap.xml', label: 'Sitemap' });
+  // crawl:begin
+  links.push({ href: '/llms.txt', label: 'llms.txt' });
+  // crawl:end
   return links;
 }
 

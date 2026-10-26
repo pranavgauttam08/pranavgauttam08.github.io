@@ -11,6 +11,11 @@ import { loadSite, PLACEHOLDER } from '../lib/site.mjs';
 import { extractJsonLdBlocks, parseJsonLdBlocks, nodesOf } from './extract.mjs';
 import { checkGraph } from './rules.mjs';
 import { checkPage } from './page-checks.mjs';
+// crawl:begin
+import { parseRobots, canFetch } from '../crawl/robots-parse.mjs';
+import { BOTS } from '../crawl/bots.mjs';
+import { isAllowed } from '../crawl/robots.mjs';
+// crawl:end
 
 const exists = async (file) => {
   try {
@@ -166,6 +171,9 @@ export async function validateDist({ rootDir, distDir, siteUrl, strict = false, 
     );
   }
 
+  // crawl:begin
+  await checkCrawlAccess({ dist, site, indexable, report, exists });
+  // crawl:end
 
   // diagram:begin
   await checkReportParity({ dist, graphsByPath, report, exists });
@@ -183,6 +191,44 @@ export async function validateDist({ rootDir, distDir, siteUrl, strict = false, 
   return { siteUrl: site.siteUrl, strict, pages, issues, totals };
 }
 
+// crawl:begin
+async function checkCrawlAccess({ dist, site, indexable, report, exists: fileExists }) {
+  const robotsFile = path.join(dist, 'robots.txt');
+  if (!(await fileExists(robotsFile))) {
+    report('error', 'X020', '/robots.txt', 'robots.txt is missing.');
+    return;
+  }
+  const parsed = parseRobots(await readFile(robotsFile, 'utf8'));
+  if (!parsed.sitemaps.includes(`${site.siteUrl}/sitemap.xml`)) {
+    report('error', 'X021', '/robots.txt', `robots.txt must list Sitemap: ${site.siteUrl}/sitemap.xml.`);
+  }
+  if (!canFetch(parsed, '*', '/')) report('error', 'X022', '/robots.txt', 'robots.txt blocks every crawler from /.');
+
+  for (const bot of BOTS) {
+    const allowed = canFetch(parsed, bot.token, '/');
+    const wanted = isAllowed(site.crawlers, bot.purpose);
+    if (allowed !== wanted) {
+      report(
+        'error',
+        'X024',
+        '/robots.txt',
+        `robots.txt ${allowed ? 'allows' : 'blocks'} ${bot.token}, but the crawler policy (${bot.purpose}) says it should be ${wanted ? 'allowed' : 'blocked'}.`,
+      );
+    }
+  }
+
+  const llmsFile = path.join(dist, 'llms.txt');
+  if (!(await fileExists(llmsFile))) {
+    report('warn', 'X025', '/llms.txt', 'llms.txt is missing.');
+  } else {
+    const llms = await readFile(llmsFile, 'utf8');
+    if (!llms.startsWith('# ')) report('warn', 'X026', '/llms.txt', 'llms.txt should start with an H1 title.');
+    for (const url of indexable.filter((u) => u.includes('/writing/') && u !== `${site.siteUrl}/writing/`)) {
+      if (!llms.includes(url)) report('warn', 'X027', '/llms.txt', `llms.txt does not list ${url}.`);
+    }
+  }
+}
+// crawl:end
 
 // diagram:begin
 async function checkReportParity({ dist, graphsByPath, report, exists: fileExists }) {
