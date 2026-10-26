@@ -6,6 +6,9 @@
 
 import { esc } from '../lib/html.mjs';
 import { PLACEHOLDER } from '../lib/site.mjs';
+// schema:begin
+import { renderJsonLdScript } from '../schema/render.mjs';
+// schema:end
 
 export function navItems() {
   const items = [
@@ -13,6 +16,9 @@ export function navItems() {
     { href: '/writing/', label: 'Writing' },
     { href: '/about/', label: 'About' },
   ];
+  // diagram:begin
+  items.push({ href: '/schema/', label: 'Schema' });
+  // diagram:end
   return items;
 }
 
@@ -23,6 +29,9 @@ export function footerLinks(site) {
     if (url.includes('linkedin.com')) links.push({ href: url, label: 'LinkedIn' });
   }
   links.push({ href: '/sitemap.xml', label: 'Sitemap' });
+  // crawl:begin
+  links.push({ href: '/llms.txt', label: 'llms.txt' });
+  // crawl:end
   return links;
 }
 
@@ -88,6 +97,9 @@ function headMeta(site, page) {
  */
 export function layout({ site, page, body, graph }) {
   let jsonLd = '';
+  // schema:begin
+  if (graph) jsonLd = renderJsonLdScript(graph);
+  // schema:end
 
   const nav = navItems()
     .map((item) => {

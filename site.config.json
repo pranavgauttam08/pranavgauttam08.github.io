@@ -1,8 +1,8 @@
 {
   "siteUrl": "https://pranavgauttam08.github.io",
   "siteName": "Pranav Gauttam",
-  "tagline": "Software engineer.",
-  "description": "Software engineer working on structured data, crawlability and AI-search visibility.",
+  "tagline": "Structured data you can inspect, test and ship.",
+  "description": "Software engineer working on structured data, crawlability and AI-search visibility. Every page on this site ships a validated JSON-LD entity graph.",
   "language": "en",
   "locale": "en_IN",
   "updated": "2026-10-26",

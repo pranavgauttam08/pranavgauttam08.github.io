@@ -11,6 +11,16 @@ import { loadSite, loadPages, loadImages, PLACEHOLDER } from '../src/lib/site.mj
 import { esc } from '../src/lib/html.mjs';
 import { layout } from '../src/templates/layout.mjs';
 import { renderBody } from '../src/templates/pages.mjs';
+// schema:begin
+import { buildGraph } from '../src/schema/graph.mjs';
+// schema:end
+// diagram:begin
+import { buildReport } from '../src/schema/report.mjs';
+// diagram:end
+// crawl:begin
+import { renderRobots } from '../src/crawl/robots.mjs';
+import { renderLlmsTxt } from '../src/crawl/llms.mjs';
+// crawl:end
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -57,6 +67,12 @@ export async function build({ rootDir = ROOT, outDir, siteUrl, log = console.log
   await cp(path.join(rootDir, 'public'), out, { recursive: true });
 
   const graphs = new Map();
+  // schema:begin
+  for (const page of pages) graphs.set(page.path, buildGraph(page, site, pages));
+  if ((site.author.sameAs ?? []).some((url) => PLACEHOLDER.test(url))) {
+    log('warning: site.config.json still has placeholder sameAs URLs. They were left out of the markup; `npm run validate:strict` will fail until you fix them.');
+  }
+  // schema:end
 
   for (const page of pages) {
     const graph = graphs.get(page.path);
@@ -76,7 +92,14 @@ export async function build({ rootDir = ROOT, outDir, siteUrl, log = console.log
 
   await writeFile(path.join(out, 'sitemap.xml'), renderSitemap(site, pages));
 
+  // diagram:begin
+  await writeFile(path.join(out, 'schema-report.json'), `${JSON.stringify(buildReport(site, pages, graphs), null, 2)}\n`);
+  // diagram:end
 
+  // crawl:begin
+  await writeFile(path.join(out, 'robots.txt'), renderRobots(site));
+  await writeFile(path.join(out, 'llms.txt'), renderLlmsTxt(site, pages, { schemaReport: graphs.size > 0 }));
+  // crawl:end
 
   log(`Built ${pages.length} pages into ${path.relative(process.cwd(), out) || '.'} for ${site.siteUrl}`);
   return { site, pages, graphs, outDir: out };
