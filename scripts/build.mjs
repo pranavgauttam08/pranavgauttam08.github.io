@@ -11,6 +11,9 @@ import { loadSite, loadPages, loadImages, PLACEHOLDER } from '../src/lib/site.mj
 import { esc } from '../src/lib/html.mjs';
 import { layout } from '../src/templates/layout.mjs';
 import { renderBody } from '../src/templates/pages.mjs';
+// schema:begin
+import { buildGraph } from '../src/schema/graph.mjs';
+// schema:end
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -57,6 +60,12 @@ export async function build({ rootDir = ROOT, outDir, siteUrl, log = console.log
   await cp(path.join(rootDir, 'public'), out, { recursive: true });
 
   const graphs = new Map();
+  // schema:begin
+  for (const page of pages) graphs.set(page.path, buildGraph(page, site, pages));
+  if ((site.author.sameAs ?? []).some((url) => PLACEHOLDER.test(url))) {
+    log('warning: site.config.json still has placeholder sameAs URLs. They were left out of the markup; `npm run validate:strict` will fail until you fix them.');
+  }
+  // schema:end
 
   for (const page of pages) {
     const graph = graphs.get(page.path);

@@ -6,6 +6,9 @@
 
 import { esc } from '../lib/html.mjs';
 import { PLACEHOLDER } from '../lib/site.mjs';
+// schema:begin
+import { renderJsonLdScript } from '../schema/render.mjs';
+// schema:end
 
 export function navItems() {
   const items = [
@@ -88,6 +91,9 @@ function headMeta(site, page) {
  */
 export function layout({ site, page, body, graph }) {
   let jsonLd = '';
+  // schema:begin
+  if (graph) jsonLd = renderJsonLdScript(graph);
+  // schema:end
 
   const nav = navItems()
     .map((item) => {
