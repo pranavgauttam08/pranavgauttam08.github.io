@@ -1,0 +1,36 @@
+{
+  "siteUrl": "https://pranavgauttam08.github.io",
+  "siteName": "Pranav Gauttam",
+  "tagline": "Software engineer.",
+  "description": "Software engineer working on structured data, crawlability and AI-search visibility.",
+  "language": "en",
+  "locale": "en_IN",
+  "updated": "2026-10-26",
+  "repoUrl": "https://github.com/pranavgauttam08/pranavgauttam08.github.io",
+  "googleSiteVerification": "",
+  "author": {
+    "name": "Pranav Gauttam",
+    "description": "Software engineer working on structured data, crawlability and AI-search visibility.",
+    "sameAs": [
+      "https://github.com/pranavgauttam08",
+      "https://www.linkedin.com/in/pranavgauttam"
+    ],
+    "knowsAbout": [
+      "Structured data",
+      "JSON-LD",
+      "Schema.org",
+      "Technical SEO",
+      "Generative engine optimization",
+      "Web crawling"
+    ],
+    "alumniOf": {
+      "name": "Thapar Institute of Engineering and Technology",
+      "url": "https://www.thapar.edu/"
+    }
+  },
+  "crawlers": {
+    "allowSearch": true,
+    "allowUserFetch": true,
+    "allowTraining": true
+  }
+}
