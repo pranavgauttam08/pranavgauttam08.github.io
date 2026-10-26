@@ -16,6 +16,9 @@ export function navItems() {
     { href: '/writing/', label: 'Writing' },
     { href: '/about/', label: 'About' },
   ];
+  // diagram:begin
+  items.push({ href: '/schema/', label: 'Schema' });
+  // diagram:end
   return items;
 }
 

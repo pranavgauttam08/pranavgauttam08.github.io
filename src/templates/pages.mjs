@@ -2,6 +2,10 @@
 
 import { esc } from '../lib/html.mjs';
 import { formatDate, renderBreadcrumbs } from './layout.mjs';
+// diagram:begin
+import { renderGraphFigure, renderVerifySection } from '../schema/figure.mjs';
+import { renderInspector } from '../schema/inspector.mjs';
+// diagram:end
 
 const byNewest = (a, b) => b.datePublished.localeCompare(a.datePublished);
 
@@ -22,6 +26,10 @@ function renderHome(ctx) {
   const { page, pages } = ctx;
   let figure = '';
   let verify = '';
+  // diagram:begin
+  figure = renderGraphFigure(ctx);
+  verify = renderVerifySection(ctx);
+  // diagram:end
   const articles = pages.filter((p) => p.kind === 'article').sort(byNewest);
   return `<section class="hero">
 <h1>${esc(page.heading)}</h1>
@@ -91,6 +99,9 @@ const renderers = {
   'writing-index': renderWritingIndex,
   article: renderArticle,
 };
+// diagram:begin
+renderers.schema = renderInspector;
+// diagram:end
 
 export function renderBody(ctx) {
   const render = renderers[ctx.page.kind];

@@ -14,6 +14,9 @@ import { renderBody } from '../src/templates/pages.mjs';
 // schema:begin
 import { buildGraph } from '../src/schema/graph.mjs';
 // schema:end
+// diagram:begin
+import { buildReport } from '../src/schema/report.mjs';
+// diagram:end
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -85,6 +88,9 @@ export async function build({ rootDir = ROOT, outDir, siteUrl, log = console.log
 
   await writeFile(path.join(out, 'sitemap.xml'), renderSitemap(site, pages));
 
+  // diagram:begin
+  await writeFile(path.join(out, 'schema-report.json'), `${JSON.stringify(buildReport(site, pages, graphs), null, 2)}\n`);
+  // diagram:end
 
 
   log(`Built ${pages.length} pages into ${path.relative(process.cwd(), out) || '.'} for ${site.siteUrl}`);

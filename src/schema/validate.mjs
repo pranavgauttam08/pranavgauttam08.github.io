@@ -167,6 +167,9 @@ export async function validateDist({ rootDir, distDir, siteUrl, strict = false, 
   }
 
 
+  // diagram:begin
+  await checkReportParity({ dist, graphsByPath, report, exists });
+  // diagram:end
 
   const totals = {
     errors: issues.filter((i) => i.level === 'error').length,
@@ -181,6 +184,27 @@ export async function validateDist({ rootDir, distDir, siteUrl, strict = false, 
 }
 
 
+// diagram:begin
+async function checkReportParity({ dist, graphsByPath, report, exists: fileExists }) {
+  const reportFile = path.join(dist, 'schema-report.json');
+  if (!(await fileExists(reportFile))) {
+    report('error', 'X040', '/schema-report.json', 'schema-report.json is missing.');
+    return;
+  }
+  const data = JSON.parse(await readFile(reportFile, 'utf8'));
+  const seen = new Set();
+  for (const entry of data.pages) {
+    seen.add(entry.path);
+    const shipped = (graphsByPath.get(entry.path) ?? []).map((n) => n['@id']);
+    if (JSON.stringify(shipped) !== JSON.stringify(entry.ids)) {
+      report('error', 'X041', entry.path, 'The graph in the HTML differs from the graph the build recorded in schema-report.json.');
+    }
+  }
+  for (const [pagePath, nodes] of graphsByPath) {
+    if (nodes.length && !seen.has(pagePath)) report('error', 'X042', pagePath, 'Page has JSON-LD that is missing from schema-report.json.');
+  }
+}
+// diagram:end
 
 const SYMBOL = { error: 'error', warn: 'warning', info: 'note' };
 
